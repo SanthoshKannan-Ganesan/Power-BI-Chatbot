@@ -1,14 +1,17 @@
 from flask import Flask, render_template, request, jsonify
 import pyodbc
 import google.generativeai as genai
+from dotenv import load_dotenv
+import os
+load_dotenv()
 
 app = Flask(__name__)
 
 def get_sqlserver_connection():
     return pyodbc.connect(
         r'DRIVER={ODBC Driver 17 for SQL Server};'
-        r'SERVER=GUGAN\SQLEXPRESS;'
-        r'DATABASE=Learn;'
+        f'SERVER={os.getenv("DB_SERVER")};'  
+        f'DATABASE={os.getenv("DB_DATABASE")};' 
         r'Trusted_Connection=yes;'
     )
 
@@ -37,7 +40,7 @@ def fetch_data_from_sql(query):
     conn.close()
     return result
 
-genai.configure(api_key="AIzaSyCbhdZdMLJILJSyAsr57EZbkZTcW95vJ0E")  
+genai.configure(api_key=os.getenv("GENAI_API_KEY")) 
 
 def get_sql_query_from_gemini(query, table_name):
     prompt = f"""
